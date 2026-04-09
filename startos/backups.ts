@@ -4,7 +4,7 @@ export const { createBackup, restoreInit } = sdk.setupBackups(async () =>
   sdk.Backups.ofVolumes('main').setOptions({
     exclude: [
       '/fulc2_db',
-      '/fulc2_db.mainnet',
+      '/fulc2_db.testnet4',
       '/latch'
     ],
   }),

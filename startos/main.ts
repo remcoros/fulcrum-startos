@@ -1,6 +1,7 @@
 import { sdk } from './sdk'
 import { i18n } from './i18n'
 import { electrumPort } from './utils'
+// TODO: replace with bitcoin-testnet-startos import when that npm package is available
 import { manifest as bitcoinManifest } from 'bitcoind-startos/startos/manifest'
 
 export const main = sdk.setupMain(async ({ effects }) => {
@@ -21,11 +22,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
             mountpoint: '/data',
             readonly: false,
           })
-          .mountDependency<typeof bitcoinManifest>({
-            dependencyId: 'bitcoind',
+          // TODO: restore generic type <typeof bitcoinManifest> once bitcoin-testnet-startos npm package exists
+          .mountDependency({
+            dependencyId: 'bitcoind-testnet',
             volumeId: 'main',
             subpath: null,
-            mountpoint: '/mnt/bitcoind',
+            mountpoint: '/mnt/bitcoind-testnet',
             readonly: true,
           }),
         'primary-sub',

@@ -8,10 +8,10 @@ import {
 } from './i18n'
 
 export const manifest = setupManifest({
-  id: 'fulcrum',
-  title: 'Fulcrum',
+  id: 'fulcrum-testnet',
+  title: 'Fulcrum (testnet4)',
   license: 'MIT',
-  packageRepo: 'https://github.com/Start9Labs/fulcrum-startos',
+  packageRepo: 'https://github.com/remcoros/fulcrum-startos/tree/testnet4',
   upstreamRepo: 'https://github.com/cculianu/Fulcrum',
   marketingUrl: 'https://github.com/cculianu/Fulcrum',
   donationUrl: 'https://github.com/cculianu/Fulcrum',
@@ -35,11 +35,11 @@ export const manifest = setupManifest({
     stop: null,
   },
   dependencies: {
-    bitcoind: {
+    'bitcoind-testnet': {
       description: bitcoindDescription,
       optional: false,
       metadata: {
-        title: 'Bitcoin Core',
+        title: 'Bitcoin Core (testnet4)',
         icon: 'https://raw.githubusercontent.com/Start9Labs/bitcoin-core-startos/refs/heads/30.x/dep-icon.svg',
       },
     },

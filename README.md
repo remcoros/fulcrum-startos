@@ -2,7 +2,7 @@
   <img src="icon.png" alt="Fulcrum Logo" width="21%">
 </p>
 
-# Fulcrum on StartOS
+# Fulcrum (testnet4) on StartOS
 
 > **Upstream docs:** <https://github.com/cculianu/Fulcrum/tree/master/doc>
 >
@@ -11,6 +11,8 @@
 > upstream documentation is accurate and fully applicable.
 
 [Fulcrum](https://github.com/cculianu/Fulcrum) is a high-performance Electrum server that indexes the Bitcoin blockchain from your own Bitcoin node. It allows you to connect hardware and software wallets to your own node, ensuring privacy and security.
+
+This package runs Fulcrum against the **testnet4** network. It depends on **Bitcoin Core (testnet4)** (`bitcoind-testnet`) instead of mainnet Bitcoin Core.
 
 ---
 
@@ -53,12 +55,12 @@
 - `fulcrum.conf` — main configuration file (INI format)
 - `banner.txt` — custom Electrum client banner (optional)
 - `fulc2_db/` — RocksDB indexes (excluded from backup)
-- `fulc2_db.mainnet/` — mainnet database (excluded from backup)
+- `fulc2_db.testnet4/` — testnet4 database (excluded from backup)
 - `latch` — sync lock file (excluded from backup)
 
 **Bitcoin dependency mount:**
 
-- `/mnt/bitcoind` — Bitcoin Core volume (read-only, for cookie auth)
+- `/mnt/bitcoind-testnet` — Bitcoin Core (testnet4) volume (read-only, for cookie auth)
 
 ---
 
@@ -74,8 +76,8 @@
 
 **First-run steps:**
 
-1. Ensure Bitcoin Core is installed with txindex enabled (auto-configured)
-2. Install Fulcrum from the StartOS marketplace
+1. Ensure Bitcoin Core (testnet4) is installed with txindex enabled (auto-configured)
+2. Install Fulcrum (testnet4) from the StartOS marketplace
 3. Wait for initial sync to complete (can take many hours)
 
 ---
@@ -84,14 +86,14 @@
 
 ### Auto-Configured by StartOS
 
-| Setting     | Value                   | Purpose                       |
-| ----------- | ----------------------- | ----------------------------- |
-| `datadir`   | `/data`                 | Data directory                |
-| `bitcoind`  | `bitcoind.startos:8332` | Bitcoin RPC connection        |
-| `rpccookie` | `/mnt/bitcoind/.cookie` | Bitcoin cookie auth           |
-| `tcp`       | `0.0.0.0:50001`         | Electrum protocol listener    |
-| `peering`   | `false`                 | Peer discovery disabled       |
-| `announce`  | `false`                 | Network announcement disabled |
+| Setting     | Value                                         | Purpose                       |
+| ----------- | --------------------------------------------- | ----------------------------- |
+| `datadir`   | `/data`                                       | Data directory                |
+| `bitcoind`  | `bitcoind-testnet.startos:48332`              | Bitcoin RPC connection        |
+| `rpccookie` | `/mnt/bitcoind-testnet/testnet4/.cookie`      | Bitcoin cookie auth           |
+| `tcp`       | `0.0.0.0:60001`                               | Electrum protocol listener    |
+| `peering`   | `false`                                       | Peer discovery disabled       |
+| `announce`  | `false`                                       | Network announcement disabled |
 
 ### Configurable via Action
 
@@ -110,7 +112,7 @@
 
 | Interface      | Internal Port | Preferred External Port | Protocol | Purpose           |
 | -------------- | ------------- | ----------------------- | -------- | ----------------- |
-| Electrum (SSL) | 50001         | 50002                   | TCP+SSL  | Electrum protocol |
+| Electrum (SSL) | 60001         | 60002                   | TCP+SSL  | Electrum protocol |
 
 **Access methods (StartOS 0.4.0):**
 
@@ -148,16 +150,17 @@ Connect wallets using the Electrum protocol (e.g., Sparrow, Electrum, BlueWallet
 
 ## Dependencies
 
-### Bitcoin Core (required)
+### Bitcoin Core (testnet4) (required)
 
 | Property | Value |
 |----------|-------|
+| Package ID | `bitcoind-testnet` |
 | Version constraint | `>=28.3` |
 | Health checks | `bitcoind` must pass before Fulcrum starts |
-| Mounted volumes | `main` → `/mnt/bitcoind` (read-only) |
-| Purpose | Blockchain data via RPC and cookie authentication |
+| Mounted volumes | `main` → `/mnt/bitcoind-testnet` (read-only) |
+| Purpose | testnet4 blockchain data via RPC and cookie authentication |
 
-StartOS creates a critical task on Bitcoin Core to enforce required settings: `prune=0`, `txindex=true`, `zmqEnabled=true`.
+StartOS creates a critical task on Bitcoin Core (testnet4) to enforce required settings: `prune=0`, `txindex=true`, `zmqEnabled=true`.
 
 ---
 
@@ -170,7 +173,7 @@ StartOS creates a critical task on Bitcoin Core to enforce required settings: `p
 **Excluded from backup:**
 
 - `fulc2_db/` — RocksDB indexes
-- `fulc2_db.mainnet/` — mainnet database
+- `fulc2_db.testnet4/` — testnet4 database
 - `latch` — sync lock file
 
 The database is excluded because it can be rebuilt from the Bitcoin node. After restoring, Fulcrum will re-sync from scratch (which can take many hours).
@@ -181,7 +184,7 @@ The database is excluded because it can be rebuilt from the Bitcoin node. After 
 
 | Check    | Display Name   | Method                    | Messages                         |
 | -------- | -------------- | ------------------------- | -------------------------------- |
-| Electrum | Electrum (SSL) | Port 50001 listening      | Ready / Not ready                |
+| Electrum | Electrum (SSL) | Port 60001 listening      | Ready / Not ready                |
 | Sync     | Sync Progress  | Controller log monitoring | Synced / [sync progress message] |
 
 During initial sync, the Sync Progress health check displays real-time progress messages from Fulcrum's controller.
@@ -219,15 +222,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 ## Quick Reference for AI Consumers
 
 ```yaml
-package_id: fulcrum
+package_id: fulcrum-testnet
 image: cculianu/fulcrum
 architectures: [x86_64, aarch64]
 volumes:
   main: /data
 ports:
-  electrum: 50001
+  electrum: 60001
 dependencies:
-  - bitcoind
+  - bitcoind-testnet
 startos_managed_env_vars: none
 actions:
   - configure

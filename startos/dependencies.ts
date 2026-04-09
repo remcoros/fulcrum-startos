@@ -1,9 +1,10 @@
+// TODO: replace with bitcoind-testnet-startos import when that npm package is available
 import { autoconfig } from 'bitcoind-startos/startos/actions/config/autoconfig'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
 
 export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
-  await sdk.action.createTask(effects, 'bitcoind', autoconfig, 'critical', {
+  await sdk.action.createTask(effects, 'bitcoind-testnet', autoconfig, 'critical', {
     input: {
       kind: 'partial',
       value: {
@@ -19,7 +20,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   })
 
   return {
-    bitcoind: {
+    'bitcoind-testnet': {
       kind: 'running',
       versionRange: '>=28.3:5',
       healthChecks: ['bitcoind'],
