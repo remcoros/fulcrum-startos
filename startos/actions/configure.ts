@@ -74,9 +74,7 @@ export const configure = sdk.Action.withInput(
   'configure',
   async () => ({
     name: i18n('Configure'),
-    description: i18n(
-      'Configure Fulcrum banner and performance settings.',
-    ),
+    description: i18n('Configure Fulcrum banner and performance settings.'),
     warning: null,
     allowedStatuses: 'any',
     group: i18n('Configuration'),
