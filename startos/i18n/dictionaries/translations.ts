@@ -107,7 +107,7 @@ export default {
     18: 'Threads de travail (0 pour automatique)',
     19: 'Définissez le nombre de threads de travail Fulcrum. Utilisez 0 pour permettre à Fulcrum de choisir automatiquement.',
     20: 'Mémoire de la base de données (Mo)',
-    21: "Limite supérieure de la mémoire utilisée par le cache RocksDB. Augmentez pour des requêtes plus rapides au détriment de la RAM.",
+    21: 'Limite supérieure de la mémoire utilisée par le cache RocksDB. Augmentez pour des requêtes plus rapides au détriment de la RAM.',
     22: 'Nombre maximal de fichiers ouverts de la base de données',
     23: 'Augmentez cette valeur si Fulcrum signale des plaintes concernant trop de fichiers ouverts.',
     24: 'Configuration',
