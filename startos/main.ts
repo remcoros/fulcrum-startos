@@ -1,37 +1,45 @@
+import { rpcHostId, rpcPort } from 'bitcoin-core-testnet-startos/startos/utils'
+import { fulcrumConf } from './file-models/fulcrum.conf'
 import { sdk } from './sdk'
 import { i18n } from './i18n'
-import { electrumPort } from './utils'
-// TODO: replace with bitcoin-testnet-startos import when that npm package is available
-import { manifest as bitcoinManifest } from 'bitcoind-startos/startos/manifest'
+import { bridgeAddress, electrumPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info(i18n('Starting Fulcrum'))
+
+  const bitcoind = await bridgeAddress(effects, {
+    packageId: 'bitcoind-testnet',
+    hostId: rpcHostId,
+    internalPort: rpcPort,
+  }).const()
+  await fulcrumConf.merge(effects, { bitcoind: bitcoind ?? undefined })
+
+  const subcontainer = sdk.SubContainer.of(
+    effects,
+    { imageId: 'main' },
+    sdk.Mounts.of()
+      .mountVolume({
+        volumeId: 'main',
+        subpath: null,
+        mountpoint: '/data',
+        readonly: false,
+      })
+      .mountDependency({
+        dependencyId: 'bitcoind-testnet',
+        volumeId: 'main',
+        subpath: null,
+        mountpoint: '/mnt/bitcoind-testnet',
+        readonly: true,
+      }),
+    'primary-sub',
+  )
 
   // var to keep track of sync progress
   let lastSyncLog: string | null = null
 
   return sdk.Daemons.of(effects)
     .addDaemon('primary', {
-      subcontainer: await sdk.SubContainer.of(
-        effects,
-        { imageId: 'main' },
-        sdk.Mounts.of()
-          .mountVolume({
-            volumeId: 'main',
-            subpath: null,
-            mountpoint: '/data',
-            readonly: false,
-          })
-          // TODO: restore generic type <typeof bitcoinManifest> once bitcoin-testnet-startos npm package exists
-          .mountDependency({
-            dependencyId: 'bitcoind-testnet',
-            volumeId: 'main',
-            subpath: null,
-            mountpoint: '/mnt/bitcoind-testnet',
-            readonly: true,
-          }),
-        'primary-sub',
-      ),
+      subcontainer,
       exec: {
         command: ['Fulcrum', '--ts-format', 'none', '/data/fulcrum.conf'],
         // capture stdout and keep track of sync progress logs
