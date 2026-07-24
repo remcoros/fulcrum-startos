@@ -1,5 +1,4 @@
-// TODO: replace with bitcoind-testnet-startos import when that npm package is available
-import { autoconfig } from 'bitcoind-startos/startos/actions/config/autoconfig'
+import { autoconfig } from 'bitcoin-core-testnet-startos/startos/actions/config/autoconfig'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
 
@@ -12,7 +11,14 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
     {
       input: {
         kind: 'partial',
-        value: {
+        accept: [
+          {
+            prune: 0,
+            txindex: true,
+            zmqEnabled: true,
+          },
+        ],
+        set: {
           prune: 0,
           txindex: true,
           zmqEnabled: true,

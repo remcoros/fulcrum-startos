@@ -72,7 +72,7 @@ This package runs Fulcrum against the **testnet4** network. It depends on **Bitc
 | Configuration | Edit `fulcrum.conf` manually | Auto-configured, tunable via action |
 | Bitcoin Core  | Manual RPC configuration     | Auto-configured via dependency      |
 
-**Install alert:** Fulcrum requires significant resources: 2GB+ RAM during sync and 180GB+ for indexes. Combined with a Bitcoin node (~800GB), total storage exceeds 1TB. A 2TB drive is strongly recommended.
+**Resource note:** Fulcrum requires significant resources: 2GB+ RAM during sync and 180GB+ for indexes. Combined with a Bitcoin node (~800GB), total storage exceeds 1TB. A 2TB drive is strongly recommended.
 
 **First-run steps:**
 
@@ -89,7 +89,7 @@ This package runs Fulcrum against the **testnet4** network. It depends on **Bitc
 | Setting     | Value                                         | Purpose                       |
 | ----------- | --------------------------------------------- | ----------------------------- |
 | `datadir`   | `/data`                                       | Data directory                |
-| `bitcoind`  | `bitcoind-testnet.startos:48332`              | Bitcoin RPC connection        |
+| `bitcoind`  | Dynamically resolved StartOS bridge address   | Bitcoin RPC connection        |
 | `rpccookie` | `/mnt/bitcoind-testnet/testnet4/.cookie`      | Bitcoin cookie auth           |
 | `tcp`       | `0.0.0.0:60001`                               | Electrum protocol listener    |
 | `peering`   | `false`                                       | Peer discovery disabled       |
@@ -161,6 +161,7 @@ Connect wallets using the Electrum protocol (e.g., Sparrow, Electrum, BlueWallet
 | Purpose | testnet4 blockchain data via RPC and cookie authentication |
 
 StartOS creates a critical task on Bitcoin Core (testnet4) to enforce required settings: `prune=0`, `txindex=true`, `zmqEnabled=true`.
+The RPC binding is resolved from Bitcoin Core's live assigned port, including after a collision or reinstall.
 
 ---
 

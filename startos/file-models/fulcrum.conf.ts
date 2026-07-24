@@ -1,18 +1,17 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
+import { rpccookiefile } from 'bitcoin-core-testnet-startos/startos/utils'
 import { sdk } from '../sdk'
 
 const iniNumber = z.union([z.string().transform(Number), z.number()])
 
 export const shape = z.object({
   datadir: z.literal('/data').catch('/data'),
-  bitcoind: z
-    .literal('bitcoind-testnet.startos:48332')
-    .catch('bitcoind-testnet.startos:48332'),
+  bitcoind: z.string().optional(),
   rpcuser: z.literal('').catch(''),
   rpcpassword: z.literal('').catch(''),
   rpccookie: z
-    .literal('/mnt/bitcoind-testnet/testnet4/.cookie')
-    .catch('/mnt/bitcoind-testnet/testnet4/.cookie'),
+    .literal(`/mnt/bitcoind-testnet/${rpccookiefile}`)
+    .catch(`/mnt/bitcoind-testnet/${rpccookiefile}`),
   tcp: z.literal('0.0.0.0:60001').catch('0.0.0.0:60001'),
   peering: z.literal(false).catch(false),
   announce: z.literal(false).catch(false),

@@ -11,18 +11,18 @@
 
 ## Getting set up
 
-Fulcrum requires Bitcoin Core (testnet4) with `prune=0`, `txindex=true`, and ZMQ enabled. StartOS posts a critical task on Bitcoin Core (testnet4) to apply these settings if they are not already in place.
+Fulcrum requires a fully indexed Bitcoin Core (testnet4) node. If Bitcoin Core needs different settings, StartOS will ask you to apply them.
 
 1. Install Bitcoin Core (testnet4) if you have not already.
-2. Install Fulcrum (testnet4). Resolve any critical task that appears on Bitcoin Core (testnet4) to enforce the required settings.
+2. Follow any setup request shown for Bitcoin Core (testnet4).
 3. Start Fulcrum (testnet4). The initial index build takes many hours.
-4. Watch the **Sync Progress** health check on the service dashboard. It reports live progress and switches to **Synced** once the Electrum interface is ready to serve clients.
+4. Watch **Sync Progress**. It switches to **Synced** when wallets can connect.
 
 ## Using Fulcrum (testnet4)
 
 ### Connecting a wallet
 
-Open the **Electrum (SSL)** interface and copy the address to your wallet (Sparrow, Electrum, BlueWallet, etc.). The interface speaks the Electrum protocol over SSL; StartOS handles the certificate and exposes the interface over LAN, Tor, and any custom domain you have attached.
+Open the **Electrum (SSL)** interface and copy its address into your wallet, such as Sparrow, Electrum, or BlueWallet.
 
 ### Configure
 
