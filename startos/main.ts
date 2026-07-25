@@ -2,16 +2,19 @@ import { rpcHostId, rpcPort } from 'bitcoin-core-testnet-startos/startos/utils'
 import { fulcrumConf } from './file-models/fulcrum.conf'
 import { sdk } from './sdk'
 import { i18n } from './i18n'
-import { bridgeAddress, electrumPort } from './utils'
+import { electrumPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info(i18n('Starting Fulcrum'))
 
-  const bitcoind = await bridgeAddress(effects, {
-    packageId: 'bitcoind-testnet',
-    hostId: rpcHostId,
-    internalPort: rpcPort,
-  }).const()
+  const bitcoind = await sdk.host
+    .getBridgeAddress(effects, {
+      packageId: 'bitcoind-testnet',
+      hostId: rpcHostId,
+      internalPort: rpcPort,
+      ssl: false,
+    })
+    .const()
   await fulcrumConf.merge(effects, { bitcoind: bitcoind ?? undefined })
 
   const subcontainer = sdk.SubContainer.of(
