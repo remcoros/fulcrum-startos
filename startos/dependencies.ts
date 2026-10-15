@@ -1,8 +1,18 @@
 import { autoconfig } from 'bitcoin-core-testnet-startos/startos/actions/config/autoconfig'
 import { i18n } from './i18n'
+import { bitcoindDescription } from './manifest/i18n'
 import { sdk } from './sdk'
 
-export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
+const bitcoind = sdk.Dependency.required('bitcoind-testnet', {
+  description: bitcoindDescription,
+  metadata: {
+    title: 'Bitcoin (testnet4)',
+    icon: 'https://raw.githubusercontent.com/Start9Labs/bitcoin-core-startos/refs/heads/30.x/dep-icon.svg',
+  },
+  kind: 'running',
+  versionRange: '>=31.1:1',
+  healthChecks: ['bitcoind'],
+}).withInit(async (effects) => {
   await sdk.action.createTask(
     effects,
     'bitcoind-testnet',
@@ -30,12 +40,6 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
       when: { condition: 'input-not-matches', once: false },
     },
   )
-
-  return {
-    'bitcoind-testnet': {
-      kind: 'running',
-      versionRange: '>=28.3:5',
-      healthChecks: ['bitcoind'],
-    },
-  }
 })
+
+export const dependencies = sdk.Dependencies.of().addDependency(bitcoind)

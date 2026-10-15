@@ -1,10 +1,10 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { bitcoindDescription, long, short } from './i18n'
+import { long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'fulcrum-testnet',
   title: 'Fulcrum (testnet4)',
-  license: 'MIT',
+  license: 'GPL-3.0-or-later',
   packageRepo: 'https://github.com/remcoros/fulcrum-startos/tree/testnet4',
   upstreamRepo: 'https://github.com/cculianu/Fulcrum',
   marketingUrl: 'https://github.com/cculianu/Fulcrum',
@@ -14,19 +14,10 @@ export const manifest = setupManifest({
   images: {
     main: {
       source: {
-        dockerTag: 'cculianu/fulcrum:v2.1.1',
+        dockerTag: 'cculianu/fulcrum:v2.1.3',
       },
       arch: ['x86_64', 'aarch64'],
-    },
-  },
-  dependencies: {
-    'bitcoind-testnet': {
-      description: bitcoindDescription,
-      optional: false,
-      metadata: {
-        title: 'Bitcoin Core (testnet4)',
-        icon: 'https://raw.githubusercontent.com/Start9Labs/bitcoin-core-startos/refs/heads/30.x/dep-icon.svg',
-      },
+      emulateMissing: false,
     },
   },
 })
