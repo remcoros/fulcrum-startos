@@ -8,6 +8,21 @@
 
 This package indexes your Bitcoin Testnet4 node for Electrum-compatible wallets. It uses the upstream image, a read-only Bitcoin data mount for cookie authentication, and the Testnet4 package's own service IDs and ports.
 
+## Table of Contents
+
+- [Image and Container Runtime](#image-and-container-runtime)
+- [Volume and Data Layout](#volume-and-data-layout)
+- [File Models](#file-models)
+- [Dependencies](#dependencies)
+- [Network Access and Interfaces](#network-access-and-interfaces)
+- [Installation and First-Run Flow](#installation-and-first-run-flow)
+- [Actions](#actions)
+- [Tasks](#tasks)
+- [Health Checks](#health-checks)
+- [Backups and Restore](#backups-and-restore)
+- [Limitations and Differences](#limitations-and-differences)
+- [Quick Reference for AI Consumers](#quick-reference-for-ai-consumers)
+
 ## Image and Container Runtime
 
 The unmodified `cculianu/fulcrum` image runs on x86_64 and aarch64. The `primary` daemon uses subcontainer `primary-sub` and runs `Fulcrum --ts-format none /data/fulcrum.conf`; StartOS supplies log timestamps. Cross-architecture emulation is disabled.
@@ -30,7 +45,7 @@ Three models describe the package's files. Configuration and state use loose sch
 | `banner.txt` | Text | Custom banner served to wallets |
 | `store.json` | JSON | `syncNotified`, the persistent sync-completion guard |
 
-The package enforces `/data` as the data directory, plaintext listening on `0.0.0.0:60001`, cookie authentication, the banner path, and disabled peering and announcements. RPC username and password are empty because the cookie supplies authentication. The `bitcoind` address comes from Bitcoin (testnet4)'s live RPC bridge binding; it is omitted while the binding is unavailable.
+The package enforces `/data` as the data directory, separate IPv4 and IPv6 listeners on `0.0.0.0:60001` and `:::60001`, cookie authentication, the banner path, and disabled peering and announcements. RPC username and password are empty because the cookie supplies authentication. The `bitcoind` address comes from Bitcoin (testnet4)'s live RPC bridge binding; it is omitted while the binding is unavailable.
 
 Configure controls RPC timeout and client count, worker threads, database memory, open files, and maximum address history. Optional numeric values are omitted when unset, allowing Fulcrum's defaults to apply; invalid numeric text is not written back as `NaN`.
 
@@ -44,11 +59,11 @@ Bitcoin (testnet4), package ID `bitcoind-testnet`, is required with kind `runnin
 
 Fulcrum requires pruning disabled, `txindex` enabled, and ZeroMQ enabled. A critical Auto-Configure task on Bitcoin requests those settings and returns if they drift. The RPC address is resolved with the provider's exported host ID and internal port over the StartOS bridge.
 
-The compile-time dependency comes from `remcoros/bitcoind-testnet4-startos` on `31.x-testnet4`; `package-lock.json` fixes the commit. An npm override keeps a single SDK copy across the package and its dependencies.
+The compile-time dependency is pinned to a verified commit from `remcoros/bitcoind-testnet4-startos`'s testnet release line; the lockfile fixes the complete dependency tree. An npm override keeps a single SDK copy across the package and its dependencies.
 
 ## Network Access and Interfaces
 
-The `main` interface on host `main` is **Electrum (SSL)**, type `api`. Preferred external ports are 60002 for TLS and 60001 for plaintext; StartOS may assign different ports. Fulcrum itself listens on 60001.
+The `main` interface on host `main` is **Electrum (SSL)**, type `api`. Preferred external ports are 60002 for TLS and 60001 for plaintext; StartOS may assign different ports. Fulcrum itself listens on 60001 over IPv4 and IPv6.
 
 StartOS terminates TLS. LAN, `.local` and domain addresses use TLS, while plaintext is available to local services over the bridge. A Tor address added with SSL disabled selects plaintext. Address schemes are shown as `ssl://` or `tcp://`, matching the selected binding. Network exposure is controlled by the user's interface settings.
 
@@ -62,7 +77,7 @@ The Electrum port opens when the address index is ready. Sync Progress displays 
 
 Configure edits the banner and performance settings. Its form reads the banner contents separately from the configuration path. Saving performance changes restarts Fulcrum; saving the same settings is safe to repeat.
 
-Reindex is recovery for a corrupted address index after checking Bitcoin sync, trying a restart, and ruling out drive errors. It writes `reindex.request` and restarts Fulcrum if running. Before the next daemon starts, the package deletes `fulc2_db`, the legacy `fulc2_db.testnet4` directory if present, and `latch`; it resets sync notification state and restores the larger cache if the value still equals the managed reduced value. Configuration and banner files are preserved.
+Reindex is recovery for a corrupted address index after checking Bitcoin sync, trying a restart, and ruling out drive errors. It writes `reindex.request` and restarts Fulcrum if running. A request during startup waits briefly for startup and then requests a restart; the request persists if the service is stopped. Before the next daemon starts, the package deletes `fulc2_db`, the legacy `fulc2_db.testnet4` directory if present, and `latch`; it resets sync notification state and restores the larger cache if the value still equals the managed reduced value. Configuration and banner files are preserved.
 
 A rebuild makes Fulcrum and its consumers unavailable for as long as indexing takes. Repeating Reindex before startup has no additional effect; repeating it after a rebuild has begun starts the rebuild over. If stopped, Fulcrum waits until its next start to delete the index.
 
@@ -74,7 +89,7 @@ One critical Auto-Configure task is raised on Bitcoin (testnet4) if pruning is e
 
 The `primary` check, displayed as Electrum (SSL), checks that port 60001 is listening. While the port is closed and indexing progress is available, it reports loading.
 
-The `sync-progress` check, displayed as Sync Progress, reports success when the Electrum port opens. Until then it shows the latest complete controller log line, or Unknown status before one arrives. UTF-8 and partial lines are buffered separately for each daemon run.
+The `sync-progress` check, displayed as Sync Progress, reports success when the Electrum port opens. Until then it shows the latest complete controller log line, or Unknown status before one arrives. A recent missing-block response from Bitcoin displays a waiting state for historical blocks, bounded to the current daemon run. UTF-8 and partial lines are buffered separately for each daemon run.
 
 ## Backups and Restore
 

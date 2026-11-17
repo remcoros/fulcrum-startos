@@ -22,13 +22,23 @@ export const reindex = sdk.Action.withoutInput(
   async ({ effects }) => {
     await writeFile(reindexRequest, '')
 
-    const status = await sdk.getStatus(effects).once()
+    let status = await sdk.getStatus(effects).once()
+    for (
+      let i = 0;
+      i < 60 && status?.desired.main === 'running' && !status.started;
+      i++
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1_000))
+      status = await sdk.getStatus(effects).once()
+    }
 
     if (
       status?.desired.main === 'running' ||
       status?.desired.main === 'restarting'
     ) {
       await sdk.restart(effects)
+      // A single restart requested mid-start is dropped; a second one is kept.
+      if (!status.started) await sdk.restart(effects)
       return {
         version: '1',
         title: i18n('Reindex'),

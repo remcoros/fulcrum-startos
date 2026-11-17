@@ -1,8 +1,6 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { totalmem } from 'os'
-import { rpccookiefile } from 'bitcoin-core-testnet-startos/startos/utils'
 import { sdk } from '../sdk'
-import { electrumPort } from '../utils'
 
 // The post-sync reduction only reclaims db_mem while it still equals this, so a
 // value the user chose in Configure stays theirs.
@@ -25,9 +23,12 @@ export const shape = z.looseObject({
   rpcuser: z.literal('').catch(''),
   rpcpassword: z.literal('').catch(''),
   rpccookie: z
-    .literal(`/mnt/bitcoind-testnet/${rpccookiefile}`)
-    .catch(`/mnt/bitcoind-testnet/${rpccookiefile}`),
-  tcp: z.literal(`0.0.0.0:${electrumPort}`).catch(`0.0.0.0:${electrumPort}`),
+    .literal('/mnt/bitcoind-testnet/testnet4/.cookie')
+    .catch('/mnt/bitcoind-testnet/testnet4/.cookie'),
+  // One line per family: Fulcrum binds IPv6 IPv6-only, and reads ini's quoted `[::]` literally.
+  tcp: z
+    .tuple([z.literal('0.0.0.0:60001'), z.literal(':::60001')])
+    .catch(['0.0.0.0:60001', ':::60001']),
   peering: z.literal(false).catch(false),
   announce: z.literal(false).catch(false),
   bitcoind_timeout: iniNumber,
@@ -45,4 +46,5 @@ export const fulcrumConf = FileHelper.ini(
     subpath: 'fulcrum.conf',
   },
   shape,
+  { bracketedArray: false },
 )
