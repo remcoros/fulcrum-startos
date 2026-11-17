@@ -16,7 +16,8 @@ The index needs additional disk space beyond your Bitcoin node. Database Memory 
 1. Install Bitcoin (testnet4) and let it sync.
 2. Resolve any setup request on Bitcoin (testnet4) to disable pruning and enable transaction indexing and ZeroMQ.
 3. Start Fulcrum (testnet4) and watch **Sync Progress** while it builds its index.
-4. Wait for **Fulcrum is synced** before connecting a wallet. A **Sync Complete** notification announces completion; Fulcrum may restart once to apply a lower memory setting.
+4. If Sync Progress says it is waiting for historical blocks, check Bitcoin’s synchronization and index progress.
+5. Wait for **Fulcrum is synced** before connecting a wallet. A **Sync Complete** notification announces completion; Fulcrum may restart once to apply a lower memory setting.
 
 ## Using Fulcrum (testnet4)
 
@@ -43,7 +44,7 @@ Run **Reindex** if Fulcrum keeps crashing and its logs report a corrupted databa
 
 Check that Bitcoin is fully synced and try a restart first. If logs report input/output errors, check the drive before rebuilding.
 
-Fulcrum and anything using it are unavailable until the rebuild finishes. Watch **Sync Progress** as during the initial build. If Fulcrum is stopped, the rebuild begins the next time you start it.
+You can request Reindex while Fulcrum is starting; the request is retained. Fulcrum and anything using it are unavailable until the rebuild finishes. Watch **Sync Progress** as during the initial build. If Fulcrum is stopped, the rebuild begins the next time you start it.
 
 ## Limitations
 

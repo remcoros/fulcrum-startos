@@ -1,10 +1,13 @@
 {
   "name": "fulcrum-startos",
   "dependencies": {
-    "@start9labs/start-sdk": "3.0.6",
-    "bitcoin-core-testnet-startos": "github:remcoros/bitcoind-testnet4-startos#ece6d7a00281caf94e41932b66410685f207cd80"
+    "@start9labs/start-sdk": "4.1.0",
+    "bitcoin-core-testnet-startos": "github:remcoros/bitcoind-testnet4-startos#f174ba0a95d531f28d29e7390cd29482a08775bc"
   },
   "overrides": {
     "@start9labs/start-sdk": "$@start9labs/start-sdk"
+  },
+  "allowScripts": {
+    "diskusage@1.2.0": true
   }
 }
